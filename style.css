@@ -1,0 +1,167 @@
+
+#header {
+    margin: 20px 5% 40px 5%;
+    max-height: 100px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid black;
+    overflow: hidden;
+    display: flex;
+}
+
+#header a {
+    font-size: 1.5rem;
+    color:#9da7b3;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+#header a :hover {
+    text-decoration: none;
+    color: #5b9be8;
+}
+
+#product-grid {
+    margin: auto 5% auto 5%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.product-card {
+    width: 180px;
+    margin: 20px;
+    padding: 10px;
+    border: 1pt solid #454545;
+    text-align: center;
+    overflow: hidden;
+}
+
+.product-card h3 {
+    font-size: 14pt;
+}
+
+.product-checkbox {
+    float: left;
+    opacity: 0.3;
+}
+
+.product-checkbox:checked {
+    opacity: 1;
+    
+}
+
+.delete-button {
+    float: right;
+    margin-right: 10px;
+    display: none;
+}
+
+#page_container {
+    margin-left: 5%;
+}
+
+.standard-table {
+    border-collapse: separate;
+    border-spacing: 5px 20px;
+}
+
+#special-attribute-field p{
+    margin-top: 10px;
+    max-width: 400px;
+}
+
+#special-attribute-field span{
+    margin-right: 10px;
+    max-width: 400px;
+}
+
+.dimensions-table {
+    border-collapse: separate;
+    border-spacing: 5px 10px;
+}
+
+.save-button {
+    margin: 5px;
+}
+
+.error-message,
+.input-error-message {
+    color: red;
+    margin-left: 10px;
+    font-size: 80%;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    padding-top: 200px;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgb(0, 0, 0, 0.4);
+
+}
+
+.modal-outer-container {
+    margin: auto;
+    display: table;
+    min-height: 100px;
+    max-width: 400px;
+    min-height: 100px;
+}
+
+.modal-inner-container {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.modal-content {
+   margin: auto;
+   padding: 10px;
+   max-width: 400px;
+   min-height: 100px; 
+   width: 80%;
+   display: table-cell; 
+   border: none;
+}
+
+.modal-content p {
+    margin: auto;
+    display: block;
+    padding: 10px;
+    font-size: large;
+    
+}
+
+.close {
+    color: gray;
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: right;
+    line-height: 0.5;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    cursor: pointer;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+  }
