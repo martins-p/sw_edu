@@ -1,41 +1,47 @@
-<?php 
-  // Headers
-  header('Access-Control-Allow-Origin: *');
-  header('Content-Type: application/json');
-  header('Access-Control-Allow-Methods: POST');
-  header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
+<?php
+// Headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-  include_once '../config/dbc.php';
-  include_once '../models/product.php';
+include_once '../config/dbc.php';
+include_once '../models/product.php';
+include_once 'validation.php';
 
-  // Instantiate DB & connect
-  $database = new Dbc();
-  $conn = $database->connect();
+// Instantiate DB & connect
+$database = new Dbc();
+$conn = $database->connect();
 
-  // Instantiate blog post object
-  $product = new Product($conn);
+// Instantiate product object
+$product = new Product($conn);
 
-  // Get raw posted data
-  $data = json_decode(file_get_contents("php://input"));
-
-  $product->sku = $data->sku;
-  $product->name = $data->name;
-  $product->price = $data->price;
-    $product->type = $data->type;
-$product->specialAttribute = $data->special_attribute;
-  $product->specialAttributeValue = $data->special_attribute_value; 
-
-  
-  
+// Get raw posted data
+$data = json_decode(file_get_contents("php://input"), true);
 
 
-  // Create post
-  if($product->create()) {
-    echo json_encode(
-      array('message' => 'Post Created')
-    );
-  } else {
-    echo json_encode(
-      array('message' => 'Post Not Created')
-    );
-  } 
+// Instantiate validator
+$validator = new InputValidator($data);
+$validationResult = $validator->validateForm();
+if (array_key_exists('errType', $validationResult)) {
+  echo json_encode($validationResult);
+  die();
+}
+
+$product->sku = $validationResult['sku'];
+$product->name = $validationResult['name'];
+$product->price = $validationResult['price'];
+$product->type = $validationResult['type'];
+$product->specialAttribute = $validationResult['special_attribute'];
+$product->specialAttributeValue = $validationResult['special_attribute_value'];
+
+// Create product
+if ($product->create()) {
+  echo json_encode(
+    array('message' => 'Product Created')
+  );
+} else {
+  echo json_encode(
+    array('message' => 'Product Not Created')
+  );
+}

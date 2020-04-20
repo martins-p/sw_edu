@@ -1,4 +1,6 @@
-
+/* import showModal from '../utils/utils.js'
+import validationErrOutput from '../utils/utils.js' */
+import * as utils from '../utils/utils.js'
 
 let getProductTypes = async () => {
     const url = 'http://localhost/sw_edu/api/readCat.php';
@@ -51,26 +53,69 @@ let Add = {
             document.getElementById("special-attribute-field").innerHTML = productSpecAtbFields[selection];
         });
 
+
+
         // Product creation form handler logic
         let productAddForm = document.getElementById('addProductForm');
         productAddForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
             new FormData(productAddForm);
         });
         productAddForm.onformdata = (e) => {
-            console.log('Formdata fired');
             let product = {};
+            let special_attribute_value = [];
+
             e.formData.forEach((value, key) => {
-                product[key] = value;
+                if (key == 'height' || key == 'length' || key == 'width') {
+                    console.log("Key = " + key);
+                    //TODO: create new object isnide object
+                    if (!product['special_attribute_value']) {
+                        product['special_attribute_value'] = {};
+                    }
+                    product['special_attribute_value'][key] = value;
+
+                } else {
+                    product[key] = value;
+                }
             });
+            if (special_attribute_value.length > 0) {
+                product
+            }
+
             var json = JSON.stringify(product);
-            console.log(json);
-            axios.post('http://localhost/sw_edu/api/create.php', json).then((response) => {
-                console.log(response);
-                router();
-            }, (error) => {
-                console.log(error);
-            });
+
+
+            /*             //Remove obsolete error messages
+                        var nodes = document.getElementsByClassName('input-error-message');
+                        console.log(nodes);
+                        for (let i = 0; i < nodes.length; i++) {
+                            console.log(nodes[i] + ' removed');
+                            nodes[i].remove();
+                        } */
+
+
+            axios.post('http://localhost/sw_edu/api/create.php', json)
+                .then(response => {
+                    let messages = response.data;
+                    
+                     //Remove obsolete error messages
+                    var nodes = document.getElementsByClassName('input-error-message');
+                    
+                    while (nodes.length>0) { 
+                        nodes[0].remove();//Is it feasible to delete the [0] element each cycle?
+                    } 
+
+                    if (messages.hasOwnProperty('errType')) {
+                        if (messages['errType'] == 'validationError') {
+                            utils.validationErrOutput(messages);
+                        } else if (messages['errType'] == 'modalError') {
+                            utils.showModal(messages['errorMsg']);
+                        }
+                    } else {
+                        //TODO : clear form
+                    }
+                })
         }
 
 
@@ -91,15 +136,15 @@ let productSpecAtbFields = {
     Furniture: `<input type="hidden" name="special_attribute" value="Dimensions">
                 <table class="dimensions-table"><tr>
                     <td>Height</td>
-                    <td><input type="number" step="0.1" id="furniture-height" name="special_attribute_value[height]"> cm <span class="input_height"></td>
+                    <td><input type="number" step="0.1" id="furniture-height" name="height"> cm <span class="input_height"></td>
                 </tr>
                 <tr>
                     <td>Width</td>
-                    <td><input type="number" step="0.1" id="furniture-width" name="special_attribute_value[width]"> cm <span class="input_width"></td>
+                    <td><input type="number" step="0.1" id="furniture-width" name="width"> cm <span class="input_width"></td>
                 </tr>
                 <tr>
                     <td>Length</td>
-                    <td><input type="number" step="0.01" id="furniture-length" name="special_attribute_value[length]"> cm <span class="input_length"></td>
+                    <td><input type="number" step="0.01" id="furniture-length" name="length"> cm <span class="input_length"></td>
                 </tr></table>
                 <p>Please specify Dimensions in cm. The value must be a valid number. Use "." as the decimal separator.</p>`,
 }

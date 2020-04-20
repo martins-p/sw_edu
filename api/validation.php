@@ -6,9 +6,9 @@ class InputValidator
     private $validationErrors = [];
     private static $fields = ['sku', 'name', 'price', 'type', 'special_attribute', 'special_attribute_value'];
 
-    public function __construct($postData)
+    public function __construct($data)
     {
-        $this->inputData = $postData;
+        $this->inputData = $data;
     }
 
     public function validateForm()

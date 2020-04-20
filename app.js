@@ -1,7 +1,9 @@
-//Router
-import {Home}   from './pages/Home.js'
-import {Add}    from './pages/Add.js'
 
+import { Home } from './pages/Home.js'
+import { Add } from './pages/Add.js'
+import * as utils from './utils/utils.js'
+
+//Router
 const router = async () => {
     const hash = window.location.hash;
     const pageContainer = document.getElementById("page_container");
@@ -14,6 +16,7 @@ const router = async () => {
         case "#home":
             pageContainer.innerHTML = await Home.render();
             await Home.afterRender(router);
+            //utils.showModal('This is a test');
             break;
 
         case "#addProduct":

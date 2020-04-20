@@ -1,53 +1,31 @@
-//import {productSpecAtbFields} from "../pages/Add.js"
 
-//Watch for product type selection change
-const changeSpecialAttributeField = () => {
-    document.getElementById("select-product-type").addEventListener("change", () => {
-        var list = document.getElementById("select-product-type");
-        var selection = list.options[list.selectedIndex].text;
-        document.getElementById("special-attribute-field").innerHTML = productSpecAtbFields[selection];
-    })
-}
-
-//Form handling logic
-let productAddFormHadler = () => {
-    productAddForm = document.querySelector('#addProductForm');
-    productAddForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        new FormData(productAddForm);
-    });
-    productAddForm.onformdata = (e) => {
-        console.log('Formdata fired');
-        let product = {};
-        e.formData.forEach((value, key) => {
-            product[key] = value;
-        });
-        var json = JSON.stringify(product);
-        console.log(json);
-        axios.post('http://localhost/sw_edu/api/create.php', json).then((response) => {
-            console.log(response);
-            onRouteChanged();
-        }, (error) => {
-            console.log(error);
-        });
-    }
-}
-
-//Checkbox scanner
-function showDeleteBtn(className) {
-    var checkboxes = document.getElementsByClassName(className);
-    const checkboxesArr = [...checkboxes];
-    checkboxesArr.forEach(box => box.addEventListener("change", function () {
-        if (checkboxesArr.filter(box => box.checked === true).length > 0) {
-            document.getElementById("deleteBtn").style.display = "block";
-        } else {
-            document.getElementById("deleteBtn").style.display = "none";
-        };
+function showModal(message) {
+    document.getElementsByClassName('modal-text')[0].innerHTML = message;
+    console.log(document.getElementsByClassName('modal')[0]);
+    document.getElementsByClassName('modal')[0].style.display = 'block';
+    document.getElementsByClassName('close')[0].addEventListener('click', ( () => {
+        document.getElementsByClassName('modal')[0].style.display = 'none';
+        document.getElementsByClassName('modal-text')[0].innerHTML = "";
     }));
+    document.addEventListener("click", (e) => {
+        var targetElement = document.getElementsByClassName('modal')[0];
+        if (targetElement = e.target) {
+            document.getElementsByClassName('modal')[0].style.display = 'none';
+            document.getElementsByClassName('modal-text')[0].innerHTML = "";
+        }
 
+    });
 }
 
+function validationErrOutput(messages) {
+    
+        for(let property in messages)  {
+            if (messages[property] !== null && messages[property] !== '' && property !== 'errType' && property !== "special_attribute") {
+                document.querySelector('.input_' + property).insertAdjacentHTML('afterend', '<span class="input-error-message">' + messages[property] + '</span>');
+            }
+        };
+    //}
+};
 
-/* export {changeSpecialAttributeField};
-export {productAddFormHadler};
-export {showDeleteBtn}; */
+export {showModal};
+export {validationErrOutput}
