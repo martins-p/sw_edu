@@ -8,16 +8,6 @@ class Dbc
     private $dbname = "sw_edu";
     private $pdo;
 
-    /*     protected function query($query)
-    {
-        $this->connect();
-        if ($this->pdo) {
-            return $this->pdo->query($query);
-        } else {
-            throw new Exception("Database query failed");
-        }
-    } */
-
     public function connect()
 
     {
@@ -30,7 +20,7 @@ class Dbc
         } catch (PDOException $e) {
             throw $e;
         }
-
+        
         return $this->pdo;
     }
 }

@@ -10,9 +10,19 @@
 
   // Instantiate DB & connect
   $database = new Dbc();
-  $conn = $database->connect();
+  try {
+    $conn = $database->connect();
+  } catch (Exception $e) {
+    $response = array(
+      'dataStatus' => false,
+      'message' => 'Database connection error'
+    );
+    http_response_code(500);
+    echo json_encode($response);
+    die();
+  };
 
-  // Instantiate blog post object
+  // Instantiate product object
   $product = new Product($conn);
 
   // Get raw posted data
@@ -21,14 +31,14 @@
   // Set SKU to update
   $product->skus = $data->skus; 
 
-  // Delete post
-  if($product->delete()) {
-    echo json_encode(
-      array('message' => 'Post Deleted')
-    );
-  } else {
-    echo json_encode(
-      array('message' => 'Post Not Deleted')
-    );
+  // Delete product
+  try {
+    $product->delete();
+  } catch (Exception $e){
+      http_response_code(400);
+      echo json_encode(array(
+        'errType' => 'modalError',
+        'errorMsg' => $e->getMessage())
+      );
   }
 

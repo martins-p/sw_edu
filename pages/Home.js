@@ -1,32 +1,52 @@
+import * as utils from '../utils/utils.js'
 
 let getProducts = async () => {
     const url = 'http://localhost/sw_edu/api/read.php';
     return axios.get(url)
         .then(response => { return response.data })
-        .catch(e => { console.log("Error retrieving products:" + e) })
+        .catch(e => { 
+            window.alert("Error retrieving products");
+            return e.response.data;
+        })
 }
 
 let Home = {
     render: async () => {
         let products = await getProducts();
-        let view = `<form id="productCardForm" method="post">
-                        <div id="product-grid">
-                            ${ products.map(product =>
-            `<div class="product-card">
+        console.log(products);
+        if (products.dataStatus === false) {
+            let viewWithoutProducts =
+            `<div class="col">
+                <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>
+                </div>
+                <form id="productCardForm" method="post">
+                    <div id="product-grid">
+                        <p>No products to display</p>    
+                    </div>
+                </form>`
+            return viewWithoutProducts;
+        } else {
+            let viewWithProducts = 
+                `<div class="col">
+                <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>
+                </div>
+                <form id="productCardForm" method="post">
+                    <div id="product-grid">
+                        ${ products.map(product =>
+                            `<div class="product-card">
                                 <input type="checkbox" class="product-checkbox" autocomplete="off" name="selected_sku[]" value="${product.sku}">
                                     <p name="sku">${product.sku}</p>
                                     <h3 name="productName">${product.name}</h3>
                                     <p name="price">Price: ${product.price} €</p>
-                                    </div>`).join(' ')
-            }    
-                        </div>
-                    </form>
-                    <div class="col">
-                        <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>
-                    </div>`
-
-        return view;
+                                    <p class="product-attribute">${product.attribute}: ${product.value} ${product.measure_unit}</p>
+                            </div>`).join(' ')
+                        }    
+                    </div>
+                </form>`
+            return viewWithProducts;
+        }
     },
+
     afterRender: async (router) => {
         //Delete button show/hide logic
         let checkboxes = document.getElementsByClassName('product-checkbox');
@@ -41,7 +61,7 @@ let Home = {
 
         //Product deletion logic
         let productDeleteForm = document.getElementById('productCardForm');
-        productDeleteForm.addEventListener('submit', (event) => {
+        productDeleteForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             let checkboxes = document.querySelectorAll('input[class="product-checkbox"]:checked');
             let skus = [];
@@ -56,9 +76,13 @@ let Home = {
             var json = JSON.stringify(data);
             axios.delete('http://localhost/sw_edu/api/delete.php', { data: json }).then((response) => {
                 console.log(response);
+                /* await Home.render();
+                await Home.afterRender(); */
                 router();
             }).catch(error => {
-                console.log(error);
+                
+                utils.showModal(error.response.data.errorMsg);
+                
             });
         });
     }

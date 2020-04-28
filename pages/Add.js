@@ -6,44 +6,83 @@ let getProductTypes = async () => {
     const url = 'http://localhost/sw_edu/api/readCat.php';
     return axios.get(url)
         .then(response => { return response.data })
-        .catch((e) => { console.log("Error retrieving product types:" + e) })
+        .catch((e) => {
+            return e.response.data;
+        })
 }
 
 let Add = {
     render: async () => {
         let productTypes = await getProductTypes();
-        let view = `<form id="addProductForm" action="" method="post">
-        <table class="standard-table">
-            <tr>
-                <td>SKU</td>
-                <td><input type="text" class="input_sku" name="sku" value="" placeholder="Enter SKU"></td>
-            </tr>
-            <tr>
-                <td>Name</td>
-                <td><input type="text" class="input_name" name="name" value="" placeholder="Enter name"></td>
-            </tr>
-            <tr>
-                <td>Price</td>
-                <td><input type="number" step="0.01" class="input_price" name="price" value="" placeholder="Enter price">
-            </tr>
-            <tr>
-                <td>Type</td>
-                <td><select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
-                        <option selected hidden style='display: none' value=''></option>
-                        ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
-                    </select>
-                </td>
-            </tr>
-        </table>
+        //console.log(productTypes);
+        if (productTypes.dataStatus == false) {
+            let view =
+                `<form id="addProductForm" action="" method="post">
+                    <table class="standard-table">
+                        <tr>
+                            <td>SKU</td>
+                            <td><input type="text" class="input_sku" name="sku" value="" placeholder="Enter SKU"></td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td><input type="text" class="input_name" name="name" value="" placeholder="Enter name"></td>
+                        </tr>
+                        <tr>
+                            <td>Price</td>
+                            <td><input type="number" step="0.01" class="input_price" name="price" value="" placeholder="Enter price">
+                        </tr>
+                        <tr>
+                            <td>Type</td>
+                            <td>
+                                <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
+                                    <option selected hidden style='display: none' value=''>
+                                </select><span>${productTypes.message}</span>
+                            </td>
+                        </tr>
+                    </table>
         
-        <div id="special-attribute-field">
-            <input type="hidden" name="special_attribute" value="">
-            <input type="hidden" name="special_attribute_value" value="">
-        </div>
-        <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-buttn" value="add" form="addProductForm">Save</button>
-        </form>`
+                    <div id="special-attribute-field">
+                        <input type="hidden" name="special_attribute" value="">
+                        <input type="hidden" name="special_attribute_value" value="">
+                    </div>
+                    <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-buttn" value="add" form="addProductForm">Save</button>
+                </form>`
+            return view;
+        } else {
+            let view =
+                `<form id="addProductForm" action="" method="post">
+                <table class="standard-table">
+                    <tr>
+                        <td>SKU</td>
+                        <td><input type="text" class="input_sku" name="sku" value="" placeholder="Enter SKU"></td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" class="input_name" name="name" value="" placeholder="Enter name"></td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td><input type="number" step="0.01" class="input_price" name="price" value="" placeholder="Enter price">
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td><select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
+                                <option selected hidden style='display: none' value=''></option>
+                                ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
 
-        return view;
+                <div id="special-attribute-field">
+                    <input type="hidden" name="special_attribute" value="">
+                    <input type="hidden" name="special_attribute_value" value="">
+                </div>
+                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-buttn" value="add" form="addProductForm">Save</button>
+            </form>`
+            return view;
+        }
+
     },
     afterRender: async (router) => {
         //Special attribute field change handling logic
@@ -62,14 +101,13 @@ let Add = {
 
             new FormData(productAddForm);
         });
-        productAddForm.onformdata = (e) => {
+        productAddForm.onformdata = async (e) => {
             let product = {};
             let special_attribute_value = [];
 
             e.formData.forEach((value, key) => {
                 if (key == 'height' || key == 'length' || key == 'width') {
                     console.log("Key = " + key);
-                    //TODO: create new object isnide object
                     if (!product['special_attribute_value']) {
                         product['special_attribute_value'] = {};
                     }
@@ -85,40 +123,30 @@ let Add = {
 
             var json = JSON.stringify(product);
 
-
-            /*             //Remove obsolete error messages
-                        var nodes = document.getElementsByClassName('input-error-message');
-                        console.log(nodes);
-                        for (let i = 0; i < nodes.length; i++) {
-                            console.log(nodes[i] + ' removed');
-                            nodes[i].remove();
-                        } */
-
-
             axios.post('http://localhost/sw_edu/api/create.php', json)
-                .then(response => {
-                    let messages = response.data;
-                    
-                     //Remove obsolete error messages
+                .then(() => {
+                    utils.showModal('Product added');
+                    router();
+                })
+                .catch((e) => {
+                    let messages = e.response.data;
+
+                    //Remove obsolete error messages
                     var nodes = document.getElementsByClassName('input-error-message');
-                    
-                    while (nodes.length>0) { 
+
+                    while (nodes.length > 0) {
                         nodes[0].remove();//Is it feasible to delete the [0] element each cycle?
-                    } 
+                    }
 
                     if (messages.hasOwnProperty('errType')) {
                         if (messages['errType'] == 'validationError') {
                             utils.validationErrOutput(messages);
-                        } else if (messages['errType'] == 'modalError') {
+                        }  else if (messages['errType'] == 'modalError') {
                             utils.showModal(messages['errorMsg']);
-                        }
-                    } else {
-                        //TODO : clear form
+                        } 
                     }
-                })
+                });
         }
-
-
     }
 }
 let productSpecAtbFields = {
@@ -150,4 +178,4 @@ let productSpecAtbFields = {
 }
 
 export { Add };
-export { productSpecAtbFields };
+//export { productSpecAtbFields };

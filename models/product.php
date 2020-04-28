@@ -12,29 +12,12 @@ class Product
     public $type;
     public $specialAttribute;
     public $specialAttributeValue;
-    public $skus= array ();
+    public $skus = array();
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
-
-    /*  public static function withProductData($data)
-    {
-        $instance = new self();
-        $instance->fillData($data);
-        return $instance;
-    }
-
-    private function fillData($data)
-    {
-        $this->sku = $data['sku'];
-        $this->name = $data['name'];
-        $this->price = $data['price'];
-        $this->type = $data['type'];
-        $this->specialAttribute = $data['special_attribute'];
-        $this->specialAttributeValue = $data['special_attribute_value'];
-    } */
 
     public function getAllProducts()
     {
@@ -44,73 +27,50 @@ class Product
         $stmt = $this->conn->prepare($query);
         // Execute query
         $stmt->execute();
-
         return $stmt;
-        /*        $output = array();
-         try {
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $output[] = $this->addUnits($row);
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        if (count($output) > 0) {
-            return $output;
-        } else {
-            throw new Exception('No products to display');
-        }*/
-    }
-
-    protected function getAllProdTypes()
-    {
-        $stmt = $this->query('SELECT type FROM product_types');
-        $output = array();
-        try {
-            while ($row = $stmt->fetch()) {
-                $output[] = $row;
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        if (count($output) > 0) {
-            return $output;
-        } else {
-            throw new Exception('No product types to display');
-        }
     }
 
     public function create()
     {
-        
+        $query_sku = 'SELECT COUNT(*) AS num FROM `products` WHERE sku = :sku';
         $query_product = 'INSERT INTO products (sku, name, price, type) VALUES (:sku,:name,:price,:type)';
         $query_attribute = 'INSERT INTO attributes (sku, attribute, value) VALUES (:sku, :attribute, :value)';
 
+        $stmt_sku = $this->conn->prepare($query_sku);
         $stmtProduct = $this->conn->prepare($query_product);
         $stmtAttribute = $this->conn->prepare($query_attribute);
 
         try {
             $this->conn->beginTransaction();
 
-            $stmtProduct->execute(array(
-                'sku' => $this->sku,
-                'name' => $this->name,
-                'price' => $this->price,
-                'type' => $this->type
-            ));
-            $stmtAttribute->execute(array(
-                'sku' => $this->sku,
-                'attribute' => $this->specialAttribute,
-                'value' => $this->specialAttributeValue
-            ));
+            /* $stmt_sku->execute(array('sku' => $this->sku));
+            $row = $stmt_sku->fetch(PDO::FETCH_ASSOC);
+
+            if ($row['num'] > 0) {
+                throw new Exception('SKU already exists in database');
+                
+            } else { */
+                $stmtProduct->execute(array(
+                    'sku' => $this->sku,
+                    'name' => $this->name,
+                    'price' => $this->price,
+                    'type' => $this->type
+                ));
+                $stmtAttribute->execute(array(
+                    'sku' => $this->sku,
+                    'attribute' => $this->specialAttribute,
+                    'value' => $this->specialAttributeValue
+                ));
+           // }
 
             $this->conn->commit();
-        } catch (Exception $e) {
-            $this->conn->rollback();
-           /*  if ($e->getCode() == 23000) {
-                throw new Exception('SKU already exists in database' . $e);
-            } else { */
+        } catch (PDOException $e) {
+            $this->conn->rollback();         
+                   if ($e->errorInfo[1] == 1062) {
+                throw new Exception('SKU already exists in database');
+            } else { 
                 throw $e;
-           // }
+            }
         }
         return true;
     }
@@ -126,10 +86,10 @@ class Product
             $this->conn->beginTransaction();
             $stmtAttribute->execute($this->skus);
             $stmtProduct->execute($this->skus);
-            /* $count = $stmtProduct->rowCount();
+             $count = $stmtProduct->rowCount();
             if ($count == 0) {
                 throw new Exception('Product could not be deleted.');
-            } */
+            }
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollback();
@@ -138,7 +98,7 @@ class Product
         return true;
     }
 
-    private function addUnits($productData)
+    public function addUnits($productData)
     {
         switch ($productData['attribute']) {
             case 'Size':

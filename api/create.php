@@ -11,7 +11,17 @@ include_once 'validation.php';
 
 // Instantiate DB & connect
 $database = new Dbc();
-$conn = $database->connect();
+try {
+  $conn = $database->connect();
+} catch (Exception $e) {
+  $response = array(
+    'status' => 500,
+    'message' => 'Database connection error'
+  );
+  http_response_code(500);
+  echo json_encode($response);
+  die();
+};
 
 // Instantiate product object
 $product = new Product($conn);
@@ -24,6 +34,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 $validator = new InputValidator($data);
 $validationResult = $validator->validateForm();
 if (array_key_exists('errType', $validationResult)) {
+  http_response_code(400);
   echo json_encode($validationResult);
   die();
 }
@@ -36,6 +47,20 @@ $product->specialAttribute = $validationResult['special_attribute'];
 $product->specialAttributeValue = $validationResult['special_attribute_value'];
 
 // Create product
+try {
+  $product->create();
+  //echo json_encode('Product created');
+
+} catch (Exception $e){
+    http_response_code(400);
+    echo json_encode(array(
+      'errType' => 'modalError',
+      'errorMsg' => $e->getMessage())
+    );
+}
+
+
+/* 
 if ($product->create()) {
   echo json_encode(
     array('message' => 'Product Created')
@@ -44,4 +69,4 @@ if ($product->create()) {
   echo json_encode(
     array('message' => 'Product Not Created')
   );
-}
+} */

@@ -1,7 +1,6 @@
 
 import { Home } from './pages/Home.js'
 import { Add } from './pages/Add.js'
-import * as utils from './utils/utils.js'
 
 //Router
 const router = async () => {

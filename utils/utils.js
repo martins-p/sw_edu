@@ -21,7 +21,9 @@ function validationErrOutput(messages) {
     
         for(let property in messages)  {
             if (messages[property] !== null && messages[property] !== '' && property !== 'errType' && property !== "special_attribute") {
-                document.querySelector('.input_' + property).insertAdjacentHTML('afterend', '<span class="input-error-message">' + messages[property] + '</span>');
+                if (document.querySelector('.input_' + property)) {
+                    document.querySelector('.input_' + property).insertAdjacentHTML('afterend', '<span class="input-error-message">' + messages[property] + '</span>');
+                };
             }
         };
     //}
