@@ -52,12 +52,16 @@
 }
 
 .delete-button {
-    float: right;
-    margin-right: 10px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+    /* float: right;
+    margin-right: 10px; */
     display: none;
 }
 
-#page_container {
+#content-container {
     margin-left: 5%;
 }
 

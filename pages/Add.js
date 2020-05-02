@@ -1,5 +1,3 @@
-/* import showModal from '../utils/utils.js'
-import validationErrOutput from '../utils/utils.js' */
 import * as utils from '../utils/utils.js'
 
 let getProductTypes = async () => {
@@ -12,44 +10,21 @@ let getProductTypes = async () => {
 }
 
 let Add = {
+
     render: async () => {
         let productTypes = await getProductTypes();
-        //console.log(productTypes);
-        if (productTypes.dataStatus == false) {
-            let view =
-                `<form id="addProductForm" action="" method="post">
-                    <table class="standard-table">
-                        <tr>
-                            <td>SKU</td>
-                            <td><input type="text" class="input_sku" name="sku" value="" placeholder="Enter SKU"></td>
-                        </tr>
-                        <tr>
-                            <td>Name</td>
-                            <td><input type="text" class="input_name" name="name" value="" placeholder="Enter name"></td>
-                        </tr>
-                        <tr>
-                            <td>Price</td>
-                            <td><input type="number" step="0.01" class="input_price" name="price" value="" placeholder="Enter price">
-                        </tr>
-                        <tr>
-                            <td>Type</td>
-                            <td>
-                                <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
-                                    <option selected hidden style='display: none' value=''>
-                                </select><span>${productTypes.message}</span>
-                            </td>
-                        </tr>
-                    </table>
-        
-                    <div id="special-attribute-field">
-                        <input type="hidden" name="special_attribute" value="">
-                        <input type="hidden" name="special_attribute_value" value="">
-                    </div>
-                    <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-buttn" value="add" form="addProductForm">Save</button>
-                </form>`
-            return view;
-        } else {
-            let view =
+        const generateTypeList = (productTypes) => {
+            if (productTypes.dataStatus === false) {
+                return `<div class="error-message">Cannot retrieve product types.<br>${productTypes.message}</div>`;
+            }
+            let productTypesList = 
+                `<select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
+                    <option selected hidden style='display: none' value=''></option>
+                    ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
+                </select>`
+            return productTypesList;
+        }
+        let view =
                 `<form id="addProductForm" action="" method="post">
                 <table class="standard-table">
                     <tr>
@@ -66,10 +41,7 @@ let Add = {
                     </tr>
                     <tr>
                         <td>Type</td>
-                        <td><select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
-                                <option selected hidden style='display: none' value=''></option>
-                                ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
-                            </select>
+                        <td>${generateTypeList(productTypes)}
                         </td>
                     </tr>
                 </table>
@@ -78,19 +50,21 @@ let Add = {
                     <input type="hidden" name="special_attribute" value="">
                     <input type="hidden" name="special_attribute_value" value="">
                 </div>
-                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-buttn" value="add" form="addProductForm">Save</button>
+                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm">Save</button>
             </form>`
-            return view;
-        }
-
+        return view;
     },
     afterRender: async (router) => {
         //Special attribute field change handling logic
-        document.getElementById("select-product-type").addEventListener("change", () => {
-            var list = document.getElementById("select-product-type");
-            var selection = list.options[list.selectedIndex].text;
-            document.getElementById("special-attribute-field").innerHTML = productSpecAtbFields[selection];
-        });
+        if(document.getElementById("select-product-type")){
+            document.getElementById("select-product-type").addEventListener("change", () => {
+                var list = document.getElementById("select-product-type");
+                var selection = list.options[list.selectedIndex].text;
+                document.getElementById("special-attribute-field").innerHTML = productSpecAtbFields[selection];
+            });
+        } else {
+            document.getElementById('save-button').setAttribute('disabled', '');
+        }
 
 
 
@@ -178,4 +152,3 @@ let productSpecAtbFields = {
 }
 
 export { Add };
-//export { productSpecAtbFields };

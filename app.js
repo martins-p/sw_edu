@@ -1,34 +1,29 @@
 
-import { Home } from './pages/Home.js'
-import { Add } from './pages/Add.js'
+import { Home }         from './pages/Home.js'
+import { Add }          from './pages/Add.js'
+import { Error404 }     from './pages/Error404.js'
 
-//Router
+import * as utils from './utils/utils.js'
+
+//Hash-based router
+let routes = {
+    '#home' : Home,
+    '#add' : Add
+}
+
 const router = async () => {
-    const hash = window.location.hash;
-    const pageContainer = document.getElementById("page_container");
+    const hash = utils.getHash();
+    const contentContainer = document.getElementById("content-container");
 
-    if (!(pageContainer instanceof HTMLElement)) {
-        throw new ReferenceError("No router view element available for rendering");
-    }
+    let page = routes[hash] ? routes[hash] : Error404;
 
-    switch (hash) {
-        case "#home":
-            pageContainer.innerHTML = await Home.render();
-            await Home.afterRender(router);
-            //utils.showModal('This is a test');
-            break;
-
-        case "#addProduct":
-            pageContainer.innerHTML = await Add.render();
-            await Add.afterRender(router);
-            break;
-
-        default:
-            pageContainer.innerHTML = "<h1>404 - Page not found</h1>";
-            break;
-    }
+    contentContainer.innerHTML = await page.render();
+    await page.afterRender(router);
 }
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
+document.getElementById(utils.getHash().substr(1)).addEventListener('click', router); // Necessary?
+
+
 

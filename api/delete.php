@@ -35,7 +35,7 @@
   try {
     $product->delete();
   } catch (Exception $e){
-      http_response_code(400);
+      http_response_code(500);
       echo json_encode(array(
         'errType' => 'modalError',
         'errorMsg' => $e->getMessage())

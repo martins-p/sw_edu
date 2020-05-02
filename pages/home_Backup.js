@@ -14,6 +14,7 @@ let Home = {
 
     render: async () => {
         let products = await getProducts();
+        console.log (products);
         const generateProductCards = (products) => {
             if (products.dataStatus === false) {
                 return `<div>No products found</div>`;  
@@ -78,12 +79,14 @@ let Home = {
             }
 
             var json = JSON.stringify(data);
-            axios.delete('http://localhost/sw_edu/api/delete.php', { data: json }).then(async () => {
-                document.getElementById("content-container").innerHTML = await Home.render();
-                await Home.afterRender(); 
+            axios.delete('http://localhost/sw_edu/api/delete.php', { data: json }).then(() => {
+                this.render();
+                //await this.afterRender(); 
                 //router();
             }).catch(error => {
-                utils.showModal(error.response.data.errorMsg);             
+                
+               // utils.showModal(error.response.data.errorMsg);
+                
             });
         });
     }
