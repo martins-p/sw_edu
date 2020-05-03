@@ -4,20 +4,24 @@ let getProducts = async () => {
     const url = 'http://localhost/sw_edu/api/read.php';
     return axios.get(url)
         .then(response => { return response.data })
-        .catch(e => { 
-            window.alert("Error retrieving products");
+        .catch(e => {
             return e.response.data;
         })
 }
 
 let Home = {
 
+    preRender: () => {
+        return `Loading...`;
+    },
     render: async () => {
         let products = await getProducts();
         const generateProductCards = (products) => {
-            if (products.dataStatus === false) {
+
+            if (products.error === true) {
                 return `<div>No products found</div>`;  
             }
+
             let productCards = products.map(product =>
                 `<div class="product-card">
                     <input type="checkbox" class="product-checkbox" autocomplete="off" name="selected_sku[]" value="${product.sku}">
@@ -30,33 +34,25 @@ let Home = {
         }    
         let view =
             `<div class="col">
-                
                 </div>
                 <form id="productCardForm" method="post">
                     <div id="product-grid">
                         ${generateProductCards(products)}    
                     </div>
-                </form>`
+                </form>
+                <div class="col">
+                    <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>
+                </div>`
 
         return view;
         },
 
-    afterRender: async (router) => {
+    afterRender: () => {
 
-        //Delete button show/hide logic       
-        let checkboxes = document.getElementsByClassName('product-checkbox');
-        const checkboxesArr = [...checkboxes];
-        checkboxesArr.forEach(box => box.addEventListener("change", function () {
-            if (checkboxesArr.filter(box => box.checked === true).length > 0) {
-                if (!document.getElementById('deleteBtn')) {
-                    let button = document.createElement("Button");
-                    button.setAttribute('type', 'submit');
-                    button.setAttribute('id', 'deleteBtn');
-                    button.setAttribute('form', 'productCardForm');
-                    button.setAttribute('class', 'delete-button btn btn-warning');
-                    button.innerHTML = "Delete";
-                    document.getElementById('product-grid').appendChild(button);
-                }
+        //Delete button show/hide logic               
+        let checkboxes = [...document.getElementsByClassName('product-checkbox')];
+        checkboxes.forEach(box => box.addEventListener("change", function () {
+            if (checkboxes.filter(box => box.checked === true).length > 0) {
                 document.getElementById('deleteBtn').style.display = 'block';
             } else {
                 document.getElementById("deleteBtn").style.display = "none";
@@ -66,13 +62,18 @@ let Home = {
         //Product deletion logic
         let productDeleteForm = document.getElementById('productCardForm');
         productDeleteForm.addEventListener('submit', async (event) => {
+
             event.preventDefault();
+
             let checkboxes = document.querySelectorAll('input[class="product-checkbox"]:checked');
+            if (!checkboxes.length > 0) {
+                utils.showModal("No checkboxes selected");
+                return;
+            }
             let skus = [];
             checkboxes.forEach((checkbox) => {
                 skus.push(checkbox.value)
             });
-
             let data = {
                 'skus': skus
             }
@@ -80,10 +81,9 @@ let Home = {
             var json = JSON.stringify(data);
             axios.delete('http://localhost/sw_edu/api/delete.php', { data: json }).then(async () => {
                 document.getElementById("content-container").innerHTML = await Home.render();
-                await Home.afterRender(); 
-                //router();
+                Home.afterRender(); 
             }).catch(error => {
-                utils.showModal(error.response.data.errorMsg);             
+                utils.showModal(error.response.data.errorMessage);             
             });
         });
     }

@@ -11,10 +11,37 @@ let getProductTypes = async () => {
 
 let Add = {
 
+    preRender: () => {
+        let view = `
+            <form id="addProductForm" action="" method="post">
+                <table class="standard-table">
+                    <tr>
+                        <td>SKU</td>
+                        <td><input type="text" disabled></td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" disabled></td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td><input type="number" disabled>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td>Loading...
+                        </td>
+                    </tr>
+                </table>
+                <button disabled>Save</button>
+        </form>`
+        return view;
+    },
+
     render: async () => {
         let productTypes = await getProductTypes();
         const generateTypeList = (productTypes) => {
-            if (productTypes.dataStatus === false) {
+            if (productTypes.error === true) {
                 return `<div class="error-message">Cannot retrieve product types.<br>${productTypes.message}</div>`;
             }
             let productTypesList = 
@@ -50,80 +77,70 @@ let Add = {
                     <input type="hidden" name="special_attribute" value="">
                     <input type="hidden" name="special_attribute_value" value="">
                 </div>
-                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm">Save</button>
+                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm" disabled>Save</button>
             </form>`
         return view;
     },
-    afterRender: async (router) => {
+    afterRender: () => {
+
         //Special attribute field change handling logic
-        if(document.getElementById("select-product-type")){
-            document.getElementById("select-product-type").addEventListener("change", () => {
-                var list = document.getElementById("select-product-type");
-                var selection = list.options[list.selectedIndex].text;
-                document.getElementById("special-attribute-field").innerHTML = productSpecAtbFields[selection];
-            });
-        } else {
-            document.getElementById('save-button').setAttribute('disabled', '');
-        }
-
-
+        let productTypeSelector = document.getElementById("select-product-type");
+        productTypeSelector.addEventListener("change", () => {
+            var selection = productTypeSelector.options[productTypeSelector.selectedIndex].text;
+            document.getElementById("special-attribute-field").innerHTML = specAtbFields[selection];
+            document.getElementById('save-button').disabled = false;
+        });
 
         // Product creation form handler logic
         let productAddForm = document.getElementById('addProductForm');
         productAddForm.addEventListener('submit', (e) => {
             e.preventDefault();
-
             new FormData(productAddForm);
         });
         productAddForm.onformdata = async (e) => {
             let product = {};
-            let special_attribute_value = [];
 
             e.formData.forEach((value, key) => {
                 if (key == 'height' || key == 'length' || key == 'width') {
-                    console.log("Key = " + key);
-                    if (!product['special_attribute_value']) {
+                     if (!product['special_attribute_value']) {
                         product['special_attribute_value'] = {};
-                    }
+                    } 
                     product['special_attribute_value'][key] = value;
 
                 } else {
                     product[key] = value;
                 }
             });
-            if (special_attribute_value.length > 0) {
-                product
-            }
-
+            
             var json = JSON.stringify(product);
 
             axios.post('http://localhost/sw_edu/api/create.php', json)
-                .then(() => {
+                .then(async () => {
                     utils.showModal('Product added');
-                    router();
+                    document.getElementById("content-container").innerHTML =  await Add.render();
+                    Add.afterRender();
                 })
                 .catch((e) => {
                     let messages = e.response.data;
 
                     //Remove obsolete error messages
                     var nodes = document.getElementsByClassName('input-error-message');
-
                     while (nodes.length > 0) {
-                        nodes[0].remove();//Is it feasible to delete the [0] element each cycle?
-                    }
+                        nodes[i].parentNode.removeChild(nodes[i]);
+                    } 
 
-                    if (messages.hasOwnProperty('errType')) {
-                        if (messages['errType'] == 'validationError') {
+                    if (messages.hasOwnProperty('errorType')) {
+                        if (messages['errorType'] == 'validation_error') {
                             utils.validationErrOutput(messages);
-                        }  else if (messages['errType'] == 'modalError') {
-                            utils.showModal(messages['errorMsg']);
+                        }  else if (messages['errorType'] == 'general_error') {
+                            utils.showModal(messages['errorMessage']);
                         } 
                     }
                 });
         }
     }
 }
-let productSpecAtbFields = {
+let specAtbFields = {
     default: `  <input type="hidden" name="special_attribute" value="">
                 <input type="hidden" name="special_attribute_value" value="">`,
     'DVD-Disc': `<input type="hidden" name="special_attribute" value="Size">

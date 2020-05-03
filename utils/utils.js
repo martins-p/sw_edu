@@ -19,7 +19,7 @@ function showModal(message) {
 function validationErrOutput(messages) {
 
     for (let property in messages) {
-        if (messages[property] !== null && messages[property] !== '' && property !== 'errType' && property !== "special_attribute") {
+        if (messages[property] !== null && messages[property] !== '' && property !== 'errorType' && property !== "special_attribute") {
             if (document.querySelector('.input_' + property)) {
                 document.querySelector('.input_' + property).insertAdjacentHTML('afterend', '<span class="input-error-message">' + messages[property] + '</span>');
             };

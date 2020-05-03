@@ -29,7 +29,7 @@ class InputValidator
         if (empty($this->validationErrors)) {
             return $this->inputData;
         } else {
-            $this->validationErrors['errType'] = 'validationError';
+            $this->validationErrors['errorType'] = 'validation_error';
             return $this->validationErrors;
         }
     }

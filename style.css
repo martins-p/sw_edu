@@ -114,7 +114,7 @@
 .modal-outer-container {
     margin: auto;
     display: table;
-    min-height: 100px;
+    min-width: 200px;
     max-width: 400px;
     min-height: 100px;
 }

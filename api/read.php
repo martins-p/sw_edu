@@ -12,7 +12,7 @@ try {
   $conn = $database->connect();
 } catch (Exception $e) {
   $response = array(
-    'dataStatus' => false,
+    'error' => true,
     'message' => 'Database connection error'
   );
   http_response_code(500);
@@ -55,7 +55,7 @@ if ($num > 0) {
   // No Products
   echo json_encode(
     array(
-      'dataStatus' => false,
+      'error' => true,
       'message' => 'No Products Found'
     )
   );

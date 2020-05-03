@@ -3,7 +3,7 @@
   header('Access-Control-Allow-Origin: *');
   header('Content-Type: application/json');
   header('Access-Control-Allow-Methods: DELETE');
-  header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
+  header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
   include_once '../config/dbc.php';
   include_once '../models/product.php';
@@ -14,7 +14,7 @@
     $conn = $database->connect();
   } catch (Exception $e) {
     $response = array(
-      'dataStatus' => false,
+      'error' => true,
       'message' => 'Database connection error'
     );
     http_response_code(500);
@@ -37,8 +37,8 @@
   } catch (Exception $e){
       http_response_code(500);
       echo json_encode(array(
-        'errType' => 'modalError',
-        'errorMsg' => $e->getMessage())
+        'errorType' => 'general_error',
+        'errorMessage' => $e->getMessage())
       );
   }
 

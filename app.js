@@ -17,13 +17,17 @@ const router = async () => {
 
     let page = routes[hash] ? routes[hash] : Error404;
 
+    contentContainer.innerHTML = page.preRender();
     contentContainer.innerHTML = await page.render();
-    await page.afterRender(router);
+    page.afterRender();
 }
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
-document.getElementById(utils.getHash().substr(1)).addEventListener('click', router); // Necessary?
 
-
-
+/* window.addEventListener('load', ()=>{
+    document.getElementById(utils.getHash().substr(1)).addEventListener('click', router)
+});
+window.addEventListener('hashchange', ()=>{
+    document.getElementById(utils.getHash().substr(1)).addEventListener('click', router)
+}) */// Necessary?

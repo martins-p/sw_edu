@@ -16,7 +16,7 @@ let Home = {
         let products = await getProducts();
         console.log (products);
         const generateProductCards = (products) => {
-            if (products.dataStatus === false) {
+            if (products.error === true) {
                 return `<div>No products found</div>`;  
             }
             let productCards = products.map(product =>
@@ -85,7 +85,7 @@ let Home = {
                 //router();
             }).catch(error => {
                 
-               // utils.showModal(error.response.data.errorMsg);
+               // utils.showModal(error.response.data.errorMessage);
                 
             });
         });
