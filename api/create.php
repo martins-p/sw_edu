@@ -16,7 +16,7 @@ try {
 } catch (Exception $e) {
   $response = array(
     'status' => 500,
-    'message' => 'Database connection error'
+    'message' => 'Error establishing a database connection'
   );
   http_response_code(500);
   echo json_encode($response);
@@ -34,7 +34,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 $validator = new InputValidator($data);
 $validationResult = $validator->validateForm();
 if (array_key_exists('errorType', $validationResult)) {
-  http_response_code(500);
+  http_response_code(400);
   echo json_encode($validationResult);
   die();
 }
@@ -51,9 +51,13 @@ try {
   $product->create();
 
 } catch (Exception $e){
+  if ($e->getPrevious()->errorInfo[1] == 1062) {
+    http_response_code(409);
+  } else {
     http_response_code(500);
+  }
     echo json_encode(array(
-      'errorType' => 'modalError',
+      'errorType' => 'general_error',
       'errorMessage' => $e->getMessage())
     );
 }

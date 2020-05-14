@@ -13,7 +13,7 @@ try {
 } catch (Exception $e) {
   $response = array(
     'error' => true,
-    'message' => 'Database connection error'
+    'message' => 'Error establishing a database connection'
   );
   http_response_code(500);
   echo json_encode($response);

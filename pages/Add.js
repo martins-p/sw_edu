@@ -1,17 +1,23 @@
 import * as utils from '../utils/utils.js'
 
-let getProductTypes = async () => {
-    const url = 'http://localhost/sw_edu/api/readCat.php';
-    return axios.get(url)
+let getProductTypes = async () =>{
+    const url = 'http://localhost/sw_edu/api/readTypes.php';
+   
+     return axios.get(url)
         .then(response => { return response.data })
         .catch((e) => {
-            return e.response.data;
+            switch (e.response.status) {
+                case 404 :
+                    return {'error' : true, 'message' : 'Server not found.'}
+                default:
+                    return e.response.data;
+            }
         })
 }
 
 let Add = {
 
-    preRender: () => {
+     preRender: () => {
         let view = `
             <form id="addProductForm" action="" method="post">
                 <table class="standard-table">
@@ -29,17 +35,22 @@ let Add = {
                     </tr>
                     <tr>
                         <td>Type</td>
-                        <td>Loading...
+                        <td>
+                            <div class="d-flex justify-content-center">
+                            <div class="spinner-border" role="status">
+                        </div>
+                      </div>
                         </td>
                     </tr>
                 </table>
-                <button disabled>Save</button>
+                <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm" disabled>Save</button>
         </form>`
         return view;
-    },
+    }, 
 
     render: async () => {
         let productTypes = await getProductTypes();
+        
         const generateTypeList = (productTypes) => {
             if (productTypes.error === true) {
                 return `<div class="error-message">Cannot retrieve product types.<br>${productTypes.message}</div>`;
@@ -50,9 +61,11 @@ let Add = {
                     ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
                 </select>`
             return productTypesList;
-        }
-        let view =
-                `<form id="addProductForm" action="" method="post">
+        } 
+
+        
+         let view =
+            `<form id="addProductForm" action="" method="post">
                 <table class="standard-table">
                     <tr>
                         <td>SKU</td>
@@ -79,17 +92,20 @@ let Add = {
                 </div>
                 <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm" disabled>Save</button>
             </form>`
-        return view;
+        return view; 
     },
     afterRender: () => {
 
         //Special attribute field change handling logic
         let productTypeSelector = document.getElementById("select-product-type");
-        productTypeSelector.addEventListener("change", () => {
-            var selection = productTypeSelector.options[productTypeSelector.selectedIndex].text;
-            document.getElementById("special-attribute-field").innerHTML = specAtbFields[selection];
-            document.getElementById('save-button').disabled = false;
-        });
+        
+        if (productTypeSelector) {
+            productTypeSelector.addEventListener("change", () => {
+                var selection = productTypeSelector.options[productTypeSelector.selectedIndex].text;
+                document.getElementById("special-attribute-field").innerHTML = specAtbFields[selection];
+                document.getElementById('save-button').disabled = false;
+            });
+        }
 
         // Product creation form handler logic
         let productAddForm = document.getElementById('addProductForm');
@@ -124,10 +140,9 @@ let Add = {
                     let messages = e.response.data;
 
                     //Remove obsolete error messages
-                    var nodes = document.getElementsByClassName('input-error-message');
-                    while (nodes.length > 0) {
-                        nodes[i].parentNode.removeChild(nodes[i]);
-                    } 
+                    while (document.querySelector('.input-error-message')) {
+                        document.querySelector('.input-error-message').remove();
+                    }
 
                     if (messages.hasOwnProperty('errorType')) {
                         if (messages['errorType'] == 'validation_error') {

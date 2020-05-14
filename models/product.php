@@ -67,7 +67,7 @@ class Product
         } catch (PDOException $e) {
             $this->conn->rollback();         
                    if ($e->errorInfo[1] == 1062) {
-                throw new Exception('SKU already exists in database');
+                throw new Exception('SKU already exists in database', 0, $e);
             } else { 
                 throw $e;
             }

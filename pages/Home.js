@@ -11,15 +11,19 @@ let getProducts = async () => {
 
 let Home = {
 
-    preRender: () => {
-        return `Loading...`;
-    },
+     preRender: () => {
+        return `
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                </div>
+             </div>`;
+    },  
     render: async () => {
         let products = await getProducts();
-        const generateProductCards = (products) => {
+         const generateProductCards = (products) => {
 
             if (products.error === true) {
-                return `<div>No products found</div>`;  
+                return `<div>${products.message}</div>`;  
             }
 
             let productCards = products.map(product =>
@@ -30,8 +34,8 @@ let Home = {
                         <p name="price">Price: ${product.price} €</p>
                         <p class="product-attribute">${product.attribute}: ${product.value} ${product.measure_unit}</p>
                 </div>`).join(' ');
-            return productCards;
-        }    
+            return productCards;  }  
+         
         let view =
             `<div class="col">
                 </div>
