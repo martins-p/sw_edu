@@ -32,24 +32,15 @@ class Product
 
     public function create()
     {
-        $query_sku = 'SELECT COUNT(*) AS num FROM `products` WHERE sku = :sku';
         $query_product = 'INSERT INTO products (sku, name, price, type) VALUES (:sku,:name,:price,:type)';
         $query_attribute = 'INSERT INTO attributes (sku, attribute, value) VALUES (:sku, :attribute, :value)';
 
-        $stmt_sku = $this->conn->prepare($query_sku);
         $stmtProduct = $this->conn->prepare($query_product);
         $stmtAttribute = $this->conn->prepare($query_attribute);
 
         try {
             $this->conn->beginTransaction();
 
-            /* $stmt_sku->execute(array('sku' => $this->sku));
-            $row = $stmt_sku->fetch(PDO::FETCH_ASSOC);
-
-            if ($row['num'] > 0) {
-                throw new Exception('SKU already exists in database');
-                
-            } else { */
                 $stmtProduct->execute(array(
                     'sku' => $this->sku,
                     'name' => $this->name,
@@ -61,7 +52,6 @@ class Product
                     'attribute' => $this->specialAttribute,
                     'value' => $this->specialAttributeValue
                 ));
-           // }
 
             $this->conn->commit();
         } catch (PDOException $e) {
@@ -114,5 +104,12 @@ class Product
                 break;
         }
         return $productData;
+    }
+
+    public function dimensionsToString($array)
+    {
+        $trimmed = array_map('trim', $array);
+        $string = implode('x', $trimmed);
+        return $string;
     }
 }

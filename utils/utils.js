@@ -1,5 +1,5 @@
 
-function showModal(message) {
+export function showModal(message) {
     document.getElementsByClassName('modal-text')[0].innerHTML = message;
     document.getElementsByClassName('modal')[0].style.display = 'block';
     document.getElementsByClassName('close')[0].addEventListener('click', (() => {
@@ -16,7 +16,7 @@ function showModal(message) {
     });
 }
 
-function validationErrOutput(messages) {
+export function validationErrOutput(messages) {
 
     for (let property in messages) {
         if (messages[property] !== null && messages[property] !== '' && property !== 'errorType' && property !== "special_attribute") {
@@ -28,10 +28,6 @@ function validationErrOutput(messages) {
 
 };
 
-function getHash() {
+export function getHash() {
     return window.location.hash || '#home';
 }
-
-export { showModal };
-export { validationErrOutput }
-export { getHash }

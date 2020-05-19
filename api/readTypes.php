@@ -8,42 +8,31 @@ include_once '../models/prodtype.php';
 
 // Instantiate DB & connect
 $database = new Dbc();
-try {
-  $conn = $database->connect();
-} catch (Exception $e) {
-  $response = array(
-    'error' => true,
-    'message' => 'Error establishing a database connection'
-  );
-  http_response_code(500);
-  echo json_encode($response);
-  die();
-};
+$conn = $database->connect();
+
 // Instantiate product type object
-$product = new ProductType($conn);
+$productTypes = new ProductType($conn);
 
 // Product type query
-$result = $product->getAllProductTypes();
+$result = $productTypes->getAllProductTypes();
 // Get row count
-$num = $result->rowCount();
+$count = $result->rowCount();
 
-// Check if any product types
-if ($num > 0) {
+// Check if any product types retrieved
+if ($count > 0) {
   // Product type array
   $productTypes_arr = array();
-  // $posts_arr['data'] = array();
-
   while ($row = $result->fetch(PDO::FETCH_COLUMN, 1)) {
-    // Push to "data"
-    $productTypes_arr[] = $row;
+    // Push to array
+    array_push($productTypes_arr, $row);
   }
 
   // Turn to JSON & output
   echo json_encode($productTypes_arr);
 } else {
-  // No ProdTypes
+  // No ProdTypes available
   echo json_encode(array(
     'error' => true,
-    'message' => 'No Types Found')
+    'message' => 'No Product Types Found')
   );
 }

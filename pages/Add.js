@@ -18,7 +18,7 @@ let getProductTypes = async () =>{
 let Add = {
 
      preRender: () => {
-        let view = `
+        let view = /*html*/ `
             <form id="addProductForm" action="" method="post">
                 <table class="standard-table">
                     <tr>
@@ -64,8 +64,8 @@ let Add = {
         } 
 
         
-         let view =
-            `<form id="addProductForm" action="" method="post">
+         let view = 
+         /*html*/ `<form id="addProductForm" action="" method="post">
                 <table class="standard-table">
                     <tr>
                         <td>SKU</td>
@@ -158,15 +158,18 @@ let Add = {
 let specAtbFields = {
     default: `  <input type="hidden" name="special_attribute" value="">
                 <input type="hidden" name="special_attribute_value" value="">`,
+                
     'DVD-Disc': `<input type="hidden" name="special_attribute" value="Size">
                 <span>Size</span>
                 <input type="number" step="0.01" name="special_attribute_value" > GB 
                 <span class="input_special_attribute_value"></span><br>
                 <p>Please specify size in GB. The value must be a valid number. Use "." as the decimal separator.</p>`,
+
     Book: `     <input type="hidden" name="special_attribute"               value="Weight">
                 <span>Weight</span><input type="number" step="0.01" name="special_attribute_value" class="input_value" > Kg 
                 <span class="input_special_attribute_value"></span><br>
                 <p>Please specify weight in Kg. The value must be a valid number. Use "." as the decimal separator.</p>`,
+
     Furniture: `<input type="hidden" name="special_attribute" value="Dimensions">
                 <table class="dimensions-table"><tr>
                     <td>Height</td>

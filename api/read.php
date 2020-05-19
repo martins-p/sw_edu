@@ -8,17 +8,7 @@ include_once '../models/product.php';
 
 // Instantiate DB & connect
 $database = new Dbc();
-try {
-  $conn = $database->connect();
-} catch (Exception $e) {
-  $response = array(
-    'error' => true,
-    'message' => 'Error establishing a database connection'
-  );
-  http_response_code(500);
-  echo json_encode($response);
-  die();
-};
+$conn = $database->connect();
 
 // Instantiate product object
 $product = new Product($conn);
@@ -26,37 +16,29 @@ $product = new Product($conn);
 // Product query
 $result = $product->getAllProducts();
 // Get row count
-$num = $result->rowCount();
+$count = $result->rowCount();
 
 // Check if any products
-if ($num > 0) {
+if ($count > 0) {
   // Product array
   $products_arr = array();
 
   while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    extract($row);
+    //Add units to row
+    $row = $product->addUnits($row);
 
-    $product_item = array(
-      'sku' => $sku,
-      'name' => $name,
-      'price' => $price,
-      'attribute' => $attribute,
-      'value' => $value
-    );
-    $product_item = $product->addUnits($product_item);
-
-    // Push to "data"
-    array_push($products_arr, $product_item);
+    // Push to products array
+    array_push($products_arr, $row);
   }
 
   // Turn to JSON & output
   echo json_encode($products_arr);
 } else {
-  // No Products
+  // Response if no products available
   echo json_encode(
     array(
       'error' => true,
-      'message' => 'No products found'
+      'message' => 'No products found.'
     )
   );
 }

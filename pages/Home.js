@@ -5,6 +5,7 @@ let getProducts = async () => {
     return axios.get(url)
         .then(response => { return response.data })
         .catch(e => {
+            console.log(e.response.data);
             return e.response.data;
         })
 }
