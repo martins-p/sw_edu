@@ -2,10 +2,10 @@
 
 class Dbc
 {
-    private $servername = "localhost";
+    private $servername = "mysql-db";
     private $username = "root";
-    private $password = "";
-    private $dbname = "sw_edu";
+    private $password = "dbunlock123";
+    private $dbname = "sw_edu_composed";
     private $pdo;
 
     public function connect()

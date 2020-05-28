@@ -1,17 +1,7 @@
 let Error404 = {
 
     preRender : () => {},
-    render : 
-    
-    /*  async () => {
-        
-        fetch('error.html',  {mode: 'no-cors'} )
-        .then(response => response.text())
-        .then(data=> console.log(data))
-        
-       
-    }  */
-    
+    render :  
      async () => {
         let view =  
         `<section class="section">

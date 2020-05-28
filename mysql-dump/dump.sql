@@ -1,11 +1,5 @@
-**SQL database access data
-
-servername = "localhost";
-username = "root";
-password = "";
-database name = "junior_test";
-
-**Queries for creating and populating tables
+CREATE DATABASE sw_edu_composed;
+USE sw_edu_composed;
 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -15,19 +9,6 @@ CREATE TABLE `products` (
   `price` float NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
-
-CREATE TABLE `attributes` (
-  `SKU` VARCHAR(45) NOT NULL,
-  `attribute` VARCHAR(45) NULL,
-  `value` VARCHAR(60) NULL,
-  PRIMARY KEY (`SKU`));
-
-CREATE TABLE `product_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(45) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8
 
 INSERT INTO products (SKU, name, type, price)
 values ('DA0013', 'DVD-RW Disc', 'DVD-disc', '2.5'),
@@ -42,6 +23,12 @@ values ('DA0013', 'DVD-RW Disc', 'DVD-disc', '2.5'),
  ('DA0083', 'Couch', 'Furniture', '199.0'),
  ('DA0098', 'Shelf', 'Furniture', '9.0');
 
+CREATE TABLE `attributes` (
+  `SKU` VARCHAR(45) NOT NULL,
+  `attribute` VARCHAR(45) NULL,
+  `value` VARCHAR(60) NULL,
+  PRIMARY KEY (`SKU`));
+
 INSERT INTO attributes (SKU, attribute, value)
 values ('DA0013', 'Size', '8'),
  ('DA0014', 'Size', '21'),
@@ -55,10 +42,14 @@ values ('DA0013', 'Size', '8'),
  ('DA0083', 'Dimensions', '120x100x220'),
  ('DA0098', 'Dimensions', '100x5x20');
 
+CREATE TABLE `product_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `type` (`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
 INSERT INTO product_types (type)
 values ('Book'),
  ('DVD-Disc'),
- ('Furniture');
-
-
-
+ ('Furniture')

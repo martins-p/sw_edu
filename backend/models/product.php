@@ -1,6 +1,4 @@
 <?php
-/* require_once 'dbc.php';
-require_once 'validation.php'; */
 
 class Product
 {
@@ -12,7 +10,7 @@ class Product
     public $type;
     public $specialAttribute;
     public $specialAttributeValue;
-    public $skus = array();
+    public $skuArray = array();
 
     public function __construct($db)
     {
@@ -67,15 +65,15 @@ class Product
 
     public function delete()
     {
-        $queryPlaceholders = str_repeat('?,', count($this->skus) - 1) . '?';
+        $queryPlaceholders = str_repeat('?,', count($this->skuArray) - 1) . '?';
         //$pdo = $this->connect();
         $stmtProduct = $this->conn->prepare("DELETE FROM products WHERE sku IN ($queryPlaceholders)");
         $stmtAttribute = $this->conn->prepare("DELETE FROM attributes WHERE sku IN ($queryPlaceholders)");
 
         try {
             $this->conn->beginTransaction();
-            $stmtAttribute->execute($this->skus);
-            $stmtProduct->execute($this->skus);
+            $stmtAttribute->execute($this->skuArray);
+            $stmtProduct->execute($this->skuArray);
              $count = $stmtProduct->rowCount();
             if ($count == 0) {
                 throw new Exception('Product could not be deleted.');

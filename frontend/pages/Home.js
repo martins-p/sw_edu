@@ -1,8 +1,8 @@
 import * as utils from '../utils/utils.js'
 
 let getProducts = async () => {
-    const url = 'http://localhost/sw_edu/api/read.php';
-    return axios.get(url)
+    const url = 'http://localhost:80/api/read.php';
+    return axios.get(url, {timeout: 200})
         .then(response => { return response.data })
         .catch(e => {
             console.log(e.response.data);
@@ -12,8 +12,8 @@ let getProducts = async () => {
 
 let Home = {
 
-     preRender: () => {
-        return `
+    preRender: () => {
+        return  /*html*/ `
             <div class="d-flex justify-content-center">
                 <div class="spinner-border" role="status">
                 </div>
@@ -27,8 +27,8 @@ let Home = {
                 return `<div>${products.message}</div>`;  
             }
 
-            let productCards = products.map(product =>
-                `<div class="product-card">
+            let productCards = products.map(product =>/*html*/ `
+                <div class="product-card">
                     <input type="checkbox" class="product-checkbox" autocomplete="off" name="selected_sku[]" value="${product.sku}">
                         <p name="sku">${product.sku}</p>
                         <h3 name="productName">${product.name}</h3>
@@ -37,17 +37,13 @@ let Home = {
                 </div>`).join(' ');
             return productCards;  }  
          
-        let view =
-            `<div class="col">
+        let view =/*html*/ `
+            <form id="productCardForm" method="post">
+                <div id="product-grid">
+                    ${generateProductCards(products)}
+                    <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>    
                 </div>
-                <form id="productCardForm" method="post">
-                    <div id="product-grid">
-                        ${generateProductCards(products)}    
-                    </div>
-                </form>
-                <div class="col">
-                    <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>
-                </div>`
+            </form>`
 
         return view;
         },
@@ -75,16 +71,16 @@ let Home = {
                 utils.showModal("No checkboxes selected");
                 return;
             }
-            let skus = [];
+            let skuArray = [];
             checkboxes.forEach((checkbox) => {
-                skus.push(checkbox.value)
+                skuArray.push(checkbox.value)
             });
             let data = {
-                'skus': skus
+                'skuArray': skuArray
             }
 
             var json = JSON.stringify(data);
-            axios.delete('http://localhost/sw_edu/api/delete.php', { data: json }).then(async () => {
+            axios.delete('http://localhost:80/api/delete.php', { data: json }).then(async () => {
                 document.getElementById("content-container").innerHTML = await Home.render();
                 Home.afterRender(); 
             }).catch(error => {

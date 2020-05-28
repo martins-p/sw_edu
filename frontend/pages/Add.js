@@ -1,7 +1,7 @@
 import * as utils from '../utils/utils.js'
 
 let getProductTypes = async () =>{
-    const url = 'http://localhost/sw_edu/api/readTypes.php';
+    const url = 'http://localhost:80/api/readTypes.php';
    
      return axios.get(url)
         .then(response => { return response.data })
@@ -44,7 +44,7 @@ let Add = {
                     </tr>
                 </table>
                 <button type="submit" name='addProduct' class="save-button btn btn-success" id="save-button" value="add" form="addProductForm" disabled>Save</button>
-        </form>`
+            </form>`
         return view;
     }, 
 
@@ -53,10 +53,11 @@ let Add = {
         
         const generateTypeList = (productTypes) => {
             if (productTypes.error === true) {
-                return `<div class="error-message">Cannot retrieve product types.<br>${productTypes.message}</div>`;
+                return /*html*/ `<div class="error-message">Cannot retrieve product types.
+                                <br>${productTypes.message}</div>`;
             }
-            let productTypesList = 
-                `<select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
+            let productTypesList = /*html*/ `
+                <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
                     <option selected hidden style='display: none' value=''></option>
                     ${productTypes.map(prodType => `<option>${prodType}</option>`).join(" ")}
                 </select>`
@@ -64,8 +65,8 @@ let Add = {
         } 
 
         
-         let view = 
-         /*html*/ `<form id="addProductForm" action="" method="post">
+         let view = /*html*/ `
+            <form id="addProductForm" action="" method="post">
                 <table class="standard-table">
                     <tr>
                         <td>SKU</td>
@@ -130,7 +131,7 @@ let Add = {
             
             var json = JSON.stringify(product);
 
-            axios.post('http://localhost/sw_edu/api/create.php', json)
+            axios.post('http://localhost:80/api/create.php', json)
                 .then(async () => {
                     utils.showModal('Product added');
                     document.getElementById("content-container").innerHTML =  await Add.render();
@@ -156,21 +157,25 @@ let Add = {
     }
 }
 let specAtbFields = {
-    default: `  <input type="hidden" name="special_attribute" value="">
-                <input type="hidden" name="special_attribute_value" value="">`,
+    default:    /*html*/ `
+                    <input type="hidden" name="special_attribute" value="">
+                    <input type="hidden" name="special_attribute_value" value="">`,
                 
-    'DVD-Disc': `<input type="hidden" name="special_attribute" value="Size">
+    'DVD-Disc': /*html*/ `
+                <input type="hidden" name="special_attribute" value="Size">
                 <span>Size</span>
                 <input type="number" step="0.01" name="special_attribute_value" > GB 
                 <span class="input_special_attribute_value"></span><br>
                 <p>Please specify size in GB. The value must be a valid number. Use "." as the decimal separator.</p>`,
 
-    Book: `     <input type="hidden" name="special_attribute"               value="Weight">
-                <span>Weight</span><input type="number" step="0.01" name="special_attribute_value" class="input_value" > Kg 
+    Book:       /*html*/ `
+                <input type="hidden" name="special_attribute" value="Weight">
+                <span>Weight</span><input type="number" step="0.01" name="special_attribute_value" class="input_value"> Kg 
                 <span class="input_special_attribute_value"></span><br>
                 <p>Please specify weight in Kg. The value must be a valid number. Use "." as the decimal separator.</p>`,
 
-    Furniture: `<input type="hidden" name="special_attribute" value="Dimensions">
+    Furniture:  /*html*/ `
+                <input type="hidden" name="special_attribute" value="Dimensions">
                 <table class="dimensions-table"><tr>
                     <td>Height</td>
                     <td><input type="number" step="0.1" id="furniture-height" name="height"> cm <span class="input_height"></td>

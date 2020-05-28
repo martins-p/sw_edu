@@ -22,7 +22,6 @@
 }
 
 #product-grid {
-    margin: auto 5% auto 5%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -53,8 +52,8 @@
 
 .delete-button {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    top: 20px;
+    right: 5%;
     z-index: 10;
     /* float: right;
     margin-right: 10px; */
@@ -62,7 +61,7 @@
 }
 
 #content-container {
-    margin-left: 5%;
+ margin: auto 5% auto 5%;
 }
 
 .standard-table {

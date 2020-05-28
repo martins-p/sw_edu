@@ -19,7 +19,7 @@ $data = json_decode(file_get_contents("php://input"));
 $product = new Product($conn);
 
 // Set SKU to update
-$product->skus = $data->skus;
+$product->skuArray = $data->skuArray;
 
 // Delete product
 try {

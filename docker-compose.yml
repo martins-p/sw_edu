@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+ webapp:
+  container_name: webapp
+  build: ./frontend
+  volumes:
+   - ./frontend:/usr/share/nginx/html
+  ports:
+   - 8080:80
+  networks:
+    - frontnet
+ 
+ php-api:
+  container_name: php_api
+  build: ./backend
+  volumes:
+    - ./backend:/var/www/html
+  ports:
+   - 80:80
+  networks:
+   - frontnet
+   - backnet
+
+ mysql-db:
+  container_name: mysql_db
+  image: mysql:8.0
+  volumes:
+   - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+  command: --default-authentication-plugin=mysql_native_password
+  networks:
+   - backnet
+   - dbadmin_net
+  environment:
+   MYSQL_ROOT_PASSWORD: dbunlock123
+ myadmin:
+  container_name: myadmin
+  image: phpmyadmin/phpmyadmin
+  networks:
+   - dbadmin_net
+  ports:
+   - 8081:80
+  environment:
+   MYSQL_USERNAME: root
+   MYSQL_ROOT_PASSWORD: dbunlock123
+   PMA_HOST: mysql_db
+networks:
+ frontnet:
+ backnet:
+ dbadmin_net:
+ 
