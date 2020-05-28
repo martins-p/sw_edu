@@ -5,7 +5,7 @@ class Dbc
     private $servername = "mysql-db";
     private $username = "root";
     private $password = "dbunlock123";
-    private $dbname = "sw_edu_composed";
+    private $dbname = "sw_edu";
     private $pdo;
 
     public function connect()

@@ -1,5 +1,5 @@
-CREATE DATABASE sw_edu_composed;
-USE sw_edu_composed;
+CREATE DATABASE sw_edu;
+USE sw_edu;
 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

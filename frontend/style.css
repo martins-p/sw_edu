@@ -51,7 +51,7 @@
 }
 
 .delete-button {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 5%;
     z-index: 10;
@@ -77,6 +77,10 @@
 #special-attribute-field span{
     margin-right: 10px;
     max-width: 400px;
+}
+
+#special-attribute-field input{
+    width: 120px;
 }
 
 .dimensions-table {
@@ -144,7 +148,8 @@
     
 }
 
-.close {
+.close-modal-btn {
+    cursor: pointer;
     color: gray;
     float: right;
     font-size: 30px;
