@@ -75,8 +75,8 @@ class Product
             $stmtAttribute->execute($this->skuArray);
             $stmtProduct->execute($this->skuArray);
              $count = $stmtProduct->rowCount();
-            if ($count == 0) {
-                throw new Exception('Product could not be deleted.');
+            if ($count !== sizeOf($this->skuArray)) {
+                throw new Exception('Product(s) could not be deleted. Possible SKU mismatch.');
             }
             $this->conn->commit();
         } catch (Exception $e) {

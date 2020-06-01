@@ -19,7 +19,6 @@ class Dbc
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             $response = array(
-                'error' => true,
                 'message' => 'Error establishing a database connection. Error code: '. $e->getCode()
               );
               http_response_code(500);

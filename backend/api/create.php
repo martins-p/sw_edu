@@ -36,7 +36,7 @@ $validationResult = $validator->isInputValid();
 if ($validationResult) {
   $responseData = array(
     'validationError' => true,
-    'message' => $validationResult
+    'validationMessages' => $validationResult
   );
   http_response_code(400);
   exit(json_encode($responseData));
@@ -67,7 +67,6 @@ try {
   }
   echo json_encode(
     array(
-      'error' => true,
       'message' => $e->getMessage()
     )
   );

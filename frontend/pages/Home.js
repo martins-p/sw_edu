@@ -4,11 +4,11 @@ import * as utils from '../utils/utils.js';
 const getProducts = async () => {
   const url = 'http://localhost:80/api/read.php';
   return axios
-    .delete(url, { timeout: 4000 })
+    .get(url, { timeout: 4000 })
     .then((response) => response.data)
     .catch((err) => {
-      const errorOutput = utils.requestErrorHandler(err);
-      return errorOutput;
+      const errorData = utils.requestErrorHandler(err);
+      return errorData;
     });
 };
 
@@ -20,13 +20,13 @@ const Home = {
             </div>`,
 
   render: async () => {
-    const products = await getProducts();
-    const generateProductCards = (products) => {
-      if (products.error === true) {
-        return `<div>${products.message}</div>`;
+    const receivedData = await getProducts();
+    const generateProductCards = (data) => {
+      if (data.error) {
+        return `<div>${data.message}</div>`;
       }
 
-      const productCards = products
+      const productCards = data
         .map(
           (product) => /*html*/ `
                 <div class="product-card">
@@ -35,7 +35,7 @@ const Home = {
                         <h3 name="productName">${product.name}</h3>
                         <p name="price">Price: ${product.price} €</p>
                         <p class="product-attribute">${product.attribute}: ${product.value} ${product.measure_unit}</p>
-                </div>`
+                </div>`,
         )
         .join(' ');
 
@@ -45,7 +45,7 @@ const Home = {
     const view = /*html*/ `
             <form id="productCardForm" method="post">
                 <div id="product-grid">
-                    ${generateProductCards(products)}
+                    ${generateProductCards(receivedData)}
                     <button type="submit" id="deleteBtn" value="delete" form="productCardForm" class="delete-button btn btn-warning">Delete</button>    
                 </div>
             </form>`;
@@ -96,8 +96,8 @@ const Home = {
           Home.afterRender();
         })
         .catch((err) => {
-          const errorOutput = utils.requestErrorHandler(err);
-          utils.showModal(errorOutput.message);
+          const errorData = utils.requestErrorHandler(err);
+          utils.showModal(errorData.message);
         });
     });
   },

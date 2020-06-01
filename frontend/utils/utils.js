@@ -1,4 +1,8 @@
 /* eslint-disable linebreak-style */
+export function getHash() {
+  return window.location.hash || '#home';
+}
+
 export function showModal(message) {
   const modalTextDiv = document.querySelector('.modal-text');
   const modalContainer = document.querySelector('.modal');
@@ -19,63 +23,38 @@ export function showModal(message) {
 }
 
 export function validationErrOutput(messages) {
-  for (let property in messages) {
-    if (
-      messages[property] !== null &&
-      messages[property] !== '' &&
-      property !== 'error' &&
-      property !== 'validationError' &&
-      property !== 'special_attribute'
-    ) {
-      if (document.querySelector('.input_' + property)) {
-        document
-          .querySelector('.input_' + property)
-          .insertAdjacentHTML(
-            'afterend',
-            '<span class="input-error-message">' +
-              messages[property] +
-              '</span>'
-          );
-      }
+  Object.keys(messages).forEach((key) => {
+    if (document.querySelector(`.input_${key}`)) {
+      document
+        .querySelector(`.input_${key}`)
+        .insertAdjacentHTML(
+          'afterend',
+          `<span class="input-error-message">${messages[key]}</span>`
+        );
     }
-  }
-}
-
-export function getHash() {
-  return window.location.hash || '#home';
+  });
 }
 
 export function requestErrorHandler(err) {
-  if (err.request) {
+  const output = {};
+  if (err.request && !err.response) {
     if (err.code === 'ECONNABORTED') {
-      return {
-        error: true,
-        message: 'Error connecting to server. Request timed out.',
-      };
+      output.message = 'Error connecting to server. Request timed out.';
+    } else {
+      output.message = 'Error: sending request failed.';
     }
-    return {
-      error: true,
-      message: 'Error: sending request failed.',
-    };
+  } else if (err.response) {
+    if (err.response.status === 404) {
+      output.message = 'Resource not found.';
+    } else if (err.response.data.validationError) {
+      output.validationError = true;
+      output.messages = err.response.data.validationMessages;
+    } else {
+      output.message = err.response.data.message;
+    }
+  } else {
+    output.message = `Oops! Something went wrong: ${err.message}`;
   }
-  switch (err.response.status) {
-    case 404:
-      return {
-        error: true,
-        message: 'Server not found.',
-      };
-    case 400:
-      if (err.response.data.validationError) {
-        return err.response.data;
-      }
-      return {
-        error: true,
-        message: err.response.data,
-      };
-    default:
-      return {
-        error: true,
-        message: err.response.data.message,
-      };
-  }
+  output.error = true;
+  return output;
 }

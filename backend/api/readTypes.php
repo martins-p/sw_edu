@@ -33,6 +33,6 @@ if ($count > 0) {
   // No ProdTypes available
   echo json_encode(array(
     'error' => true,
-    'message' => 'No product types found')
-  );
+    'message' => 'No product types found'
+  ));
 }

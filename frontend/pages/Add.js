@@ -10,8 +10,8 @@ async function getProductTypes() {
     .get(url, { timeout: 4000 })
     .then((response) => response.data)
     .catch((err) => {
-      const errorOutput = utils.requestErrorHandler(err);
-      return errorOutput;
+      const errorData = utils.requestErrorHandler(err);
+      return errorData;
     });
 }
 
@@ -48,21 +48,24 @@ const Add = {
   },
 
   render: async () => {
-    const productTypes = await getProductTypes();
-
-    const generateTypeList = (productTypes) => {
-      if (productTypes.error === true) {
-        return /*html*/ `<div class="error-message">Cannot retrieve product types.
-                                <br>${productTypes.message}</div>`;
+    const receivedData = await getProductTypes();
+    const generateTypeList = (data) => {
+      if (data.error) {
+        const typeList = /*html*/ `<div class="error-message">Cannot retrieve product types.<br>
+          ${data.message}</div>`;
+        return typeList;
       }
-      const productTypesList = productTypes
+
+      const productTypesList = data
         .map((prodType) => `<option>${prodType}</option>`)
         .join(' ');
+
       const productTypesSelector = /*html*/ `
                 <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
                     <option selected hidden style='display: none' value=''></option>
                     ${productTypesList}
                 </select>`;
+
       return productTypesSelector;
     };
 
@@ -83,7 +86,7 @@ const Add = {
                     </tr>
                     <tr>
                         <td>Type</td>
-                        <td>${generateTypeList(productTypes)}
+                        <td>${generateTypeList(receivedData)}
                         </td>
                     </tr>
                 </table>
@@ -140,17 +143,16 @@ const Add = {
           Add.afterRender();
         })
         .catch((err) => {
-          const errorOutput = utils.requestErrorHandler(err);
+          const errorData = utils.requestErrorHandler(err);
 
           //    Remove obsolete validation error messages
           while (document.querySelector('.input-error-message')) {
             document.querySelector('.input-error-message').remove();
           }
-
-          if (errorOutput.validationError === true) {
-            utils.validationErrOutput(errorOutput.message);
-          } else if (errorOutput.error === true) {
-            utils.showModal(errorOutput.message);
+          if (errorData.validationError) {
+            utils.validationErrOutput(errorData.messages);
+          } else {
+            utils.showModal(errorData.message);
           }
         });
     });
