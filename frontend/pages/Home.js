@@ -4,13 +4,11 @@ import * as utils from '../utils/utils.js';
 const getProducts = async () => {
   const url = 'http://localhost:80/api/read.php';
   return axios
-    .get(url, { timeout: 4000 })
+    .delete(url, { timeout: 4000 })
     .then((response) => response.data)
-    .catch((e) => {
-      if (e.code === 'ECONNABORTED') {
-        return { error: true, message: 'Error connecting to server. Request timed out.' };
-      }
-      return e.response.data;
+    .catch((err) => {
+      const errorOutput = utils.requestErrorHandler(err);
+      return errorOutput;
     });
 };
 
@@ -64,7 +62,7 @@ const Home = {
       } else {
         document.getElementById('deleteBtn').style.display = 'none';
       }
-    })
+    }),
     );
 
     //  Product deletion logic
@@ -97,12 +95,9 @@ const Home = {
           document.getElementById('content-container').innerHTML = await Home.render();
           Home.afterRender();
         })
-        .catch((error) => {
-          if (error.code === 'ECONNABORTED') {
-            utils.showModal('Error: connection timed out');
-          } else {
-            utils.showModal(error.response.data.errorMessage);
-          }
+        .catch((err) => {
+          const errorOutput = utils.requestErrorHandler(err);
+          utils.showModal(errorOutput.message);
         });
     });
   },

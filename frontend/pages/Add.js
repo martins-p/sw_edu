@@ -1,3 +1,5 @@
+/* eslint-disable linebreak-style */
+
 import * as utils from '../utils/utils.js';
 import specAtbFields from './components/special_attr_fields.js';
 
@@ -8,15 +10,8 @@ async function getProductTypes() {
     .get(url, { timeout: 4000 })
     .then((response) => response.data)
     .catch((err) => {
-      if (err.code === 'ECONNABORTED') {
-        return { error: true, message: 'Error: connection timeout' };
-      }
-      switch (err.response.status) {
-        case 404:
-          return { error: true, message: 'Server not found.' };
-        default:
-          return err.response.data;
-      }
+      const errorOutput = utils.requestErrorHandler(err);
+      return errorOutput;
     });
 }
 
@@ -107,8 +102,10 @@ const Add = {
 
     if (productTypeDropdown) {
       productTypeDropdown.addEventListener('change', () => {
-        const selection = productTypeDropdown.options[productTypeDropdown.selectedIndex].text;
-        document.getElementById('special-attribute-field').innerHTML = specAtbFields[selection];
+        const selection =
+          productTypeDropdown.options[productTypeDropdown.selectedIndex].text;
+        document.getElementById('special-attribute-field').innerHTML =
+          specAtbFields[selection];
         document.getElementById('save-button').disabled = false;
       });
     }
@@ -137,30 +134,23 @@ const Add = {
         .post('http://localhost:80/api/create.php', json, { timeout: 3000 })
         .then(async () => {
           utils.showModal('Product successfully added.');
-          document.getElementById('content-container').innerHTML = await Add.render();
+          document.getElementById(
+            'content-container'
+          ).innerHTML = await Add.render();
           Add.afterRender();
         })
         .catch((err) => {
-          let messages;
-          if (err.code === 'ECONNABORTED') {
-            messages = {
-              errorType: 'general_error',
-              errorMessage: 'Error: connection timeout',
-            };
-          } else {
-            messages = err.response.data;
-          }
-          //    Remove obsolete error messages
+          const errorOutput = utils.requestErrorHandler(err);
+
+          //    Remove obsolete validation error messages
           while (document.querySelector('.input-error-message')) {
             document.querySelector('.input-error-message').remove();
           }
 
-          if (messages.hasOwnProperty('errorType')) {
-            if (messages.errorType === 'validation_error') {
-              utils.validationErrOutput(messages);
-            } else if (messages.errorType === 'general_error') {
-              utils.showModal(messages.errorMessage);
-            }
+          if (errorOutput.validationError === true) {
+            utils.validationErrOutput(errorOutput.message);
+          } else if (errorOutput.error === true) {
+            utils.showModal(errorOutput.message);
           }
         });
     });

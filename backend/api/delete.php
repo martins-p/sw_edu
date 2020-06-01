@@ -28,8 +28,8 @@ try {
   http_response_code(400);
   echo json_encode(
     array(
-      'errorType' => 'general_error',
-      'errorMessage' => $e->getMessage()
+      'error' => true,
+      'message' => $e->getMessage()
     )
   );
 }

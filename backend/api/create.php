@@ -34,9 +34,12 @@ unset($value);
 $validator = new ProductValidator($sanitizedData);
 $validationResult = $validator->isInputValid();
 if ($validationResult) {
-  $validationResult['errorType'] = 'validation_error';
+  $responseData = array(
+    'validationError' => true,
+    'message' => $validationResult
+  );
   http_response_code(400);
-  exit(json_encode($validationResult));
+  exit(json_encode($responseData));
 }
 
 // Instantiate product object and bind values
@@ -64,8 +67,8 @@ try {
   }
   echo json_encode(
     array(
-      'errorType' => 'general_error',
-      'errorMessage' => $e->getMessage()
+      'error' => true,
+      'message' => $e->getMessage()
     )
   );
 }
