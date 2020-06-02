@@ -15,6 +15,26 @@ async function getProductTypes() {
     });
 }
 
+const generateTypeList = (data) => {
+  if (data.error) {
+    const typeList = /*html*/ `<div class="error-message">Cannot retrieve product types.<br>
+      ${data.message}</div>`;
+    return typeList;
+  }
+
+  const productTypeList = data
+    .map((prodType) => `<option>${prodType}</option>`)
+    .join(' ');
+
+  const productTypeSelector = /*html*/ `
+            <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
+                <option selected hidden style='display: none' value=''></option>
+                ${productTypeList}
+            </select>`;
+
+  return productTypeSelector;
+};
+
 const Add = {
   preRender: () => {
     const view = /*html*/ `
@@ -49,25 +69,6 @@ const Add = {
 
   render: async () => {
     const receivedData = await getProductTypes();
-    const generateTypeList = (data) => {
-      if (data.error) {
-        const typeList = /*html*/ `<div class="error-message">Cannot retrieve product types.<br>
-          ${data.message}</div>`;
-        return typeList;
-      }
-
-      const productTypesList = data
-        .map((prodType) => `<option>${prodType}</option>`)
-        .join(' ');
-
-      const productTypesSelector = /*html*/ `
-                <select name="type" id="select-product-type" class="input_type" autocomplete="off" value="">
-                    <option selected hidden style='display: none' value=''></option>
-                    ${productTypesList}
-                </select>`;
-
-      return productTypesSelector;
-    };
 
     const view = /*html*/ `
             <form id="addProductForm" action="" method="post">
@@ -105,10 +106,8 @@ const Add = {
 
     if (productTypeDropdown) {
       productTypeDropdown.addEventListener('change', () => {
-        const selection =
-          productTypeDropdown.options[productTypeDropdown.selectedIndex].text;
-        document.getElementById('special-attribute-field').innerHTML =
-          specAtbFields[selection];
+        const selection = productTypeDropdown.options[productTypeDropdown.selectedIndex].text;
+        document.getElementById('special-attribute-field').innerHTML = specAtbFields[selection];
         document.getElementById('save-button').disabled = false;
       });
     }
@@ -136,19 +135,19 @@ const Add = {
       axios
         .post('http://localhost:80/api/create.php', json, { timeout: 3000 })
         .then(async () => {
-          utils.showModal('Product successfully added.');
+          utils.showModal('Product successfully added');
           document.getElementById(
-            'content-container'
+            'content-container',
           ).innerHTML = await Add.render();
           Add.afterRender();
         })
         .catch((err) => {
           const errorData = utils.requestErrorHandler(err);
 
-          //    Remove obsolete validation error messages
           while (document.querySelector('.input-error-message')) {
             document.querySelector('.input-error-message').remove();
           }
+
           if (errorData.validationError) {
             utils.validationErrOutput(errorData.messages);
           } else {

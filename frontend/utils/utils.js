@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 export function getHash() {
   return window.location.hash || '#home';
 }
@@ -24,13 +23,12 @@ export function showModal(message) {
 
 export function validationErrOutput(messages) {
   Object.keys(messages).forEach((key) => {
-    if (document.querySelector(`.input_${key}`)) {
-      document
-        .querySelector(`.input_${key}`)
-        .insertAdjacentHTML(
-          'afterend',
-          `<span class="input-error-message">${messages[key]}</span>`
-        );
+    const field = document.querySelector(`.input_${key}`);
+    if (field) {
+      field.insertAdjacentHTML(
+        'afterend',
+        `<span class="input-error-message">${messages[key]}</span>`
+      );
     }
   });
 }

@@ -1,5 +1,4 @@
 <?php
-// Headers
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
@@ -10,14 +9,11 @@ include_once '../models/product.php';
 include_once 'validation.php';
 include_once 'sanitizer.php';
 
-// Instantiate DB & connect
 $database = new Dbc();
 $conn = $database->connect();
 
-// Get raw posted data
 $data = json_decode(file_get_contents("php://input"), true);
 
-//Sanitize input
 foreach ($data as $key => $value) {
   if (is_array($value)) {
     foreach ($value as $subKey => $subValue) {
@@ -30,7 +26,6 @@ foreach ($data as $key => $value) {
 }
 unset($value);
 
-// Validate input
 $validator = new ProductValidator($sanitizedData);
 $validationResult = $validator->isInputValid();
 if ($validationResult) {
@@ -42,7 +37,6 @@ if ($validationResult) {
   exit(json_encode($responseData));
 }
 
-// Instantiate product object and bind values
 $product = new Product($conn);
 
 $product->sku = $sanitizedData['sku'];
@@ -56,7 +50,6 @@ if (is_array($sanitizedData['special_attribute_value'])) {
   $product->specialAttributeValue = $sanitizedData['special_attribute_value'];
 }
 
-// Create product
 try {
   $product->create();
 } catch (Exception $e) {
